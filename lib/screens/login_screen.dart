@@ -1,10 +1,13 @@
 // ignore_for_file: use_key_in_widget_constructors
 
-import 'package:auth_app/screens/register_screen.dart';
-import 'package:auth_app/widgets/auth_background.dart';
-import 'package:auth_app/widgets/custom_buttom_sign.dart';
-import 'package:auth_app/widgets/custom_field.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+//
+import 'package:auth_app/widgets/custom_field.dart';
+import 'package:auth_app/provider/auth_provider.dart';
+import 'package:auth_app/widgets/auth_background.dart';
+import 'package:auth_app/screens/register_screen.dart';
+import 'package:auth_app/widgets/custom_buttom_sign.dart';
 
 const imageSvg = 'assets/login.svg';
 Color primary = Colors.white.withOpacity(0.6);
@@ -24,7 +27,10 @@ class LoginScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(height: size.height * 0.5),
-                _LoginForm(),
+                ChangeNotifierProvider(
+                  create: (_) => AuthProvider(),
+                  child: _LoginForm(),
+                ),
                 const SizedBox(height: 70),
                 Text(
                   '¿No tienes Cuenta?',
@@ -75,7 +81,9 @@ class LoginScreen extends StatelessWidget {
 class _LoginForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
     return Form(
+      key: authProvider.formKey,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       child: Column(
         children: [
@@ -96,14 +104,14 @@ class _LoginForm extends StatelessWidget {
                   color: primary,
                 ),
               ),
-              onChanged: (value) {},
+              onChanged: (value) => authProvider.email = value,
             ),
           ),
           const SizedBox(height: 30),
           // Password
           CustomTextField(
             child: TextFormField(
-              obscureText: true, // condicion aca
+              obscureText: authProvider.isVisible ? true : false,
               cursorColor: Colors.tealAccent,
               autocorrect: false,
               keyboardType: TextInputType.visiblePassword,
@@ -118,22 +126,37 @@ class _LoginForm extends StatelessWidget {
                   color: primary,
                 ),
                 suffixIcon: IconButton(
-                  icon: Icon(
-                    Icons.visibility_off, //visibility_rounded
-                    size: 24,
-                    color: primary,
-                  ),
-                  onPressed: () {},
+                  icon: authProvider.isVisible
+                      ? Icon(
+                          Icons.visibility_rounded,
+                          size: 24,
+                          color: primary,
+                        )
+                      : Icon(
+                          Icons.visibility_off,
+                          size: 24,
+                          color: primary,
+                        ),
+                  onPressed: () =>
+                      authProvider.isVisible = !authProvider.isVisible,
                 ),
               ),
-              onChanged: (value) {},
+              onChanged: (value) => authProvider.password = value,
             ),
           ),
           const SizedBox(height: 80),
           // Sign in
           CustomButtomSign(
             text: 'Sign In',
-            onPressed: () {},
+            onPressed: () {
+              FocusScope.of(context).unfocus();
+
+              final authenticate = authProvider.isValidForm();
+
+              if (!authenticate) return debugPrint('Formulario No valido');
+
+              debugPrint('Excelente');
+            },
           ),
         ],
       ),

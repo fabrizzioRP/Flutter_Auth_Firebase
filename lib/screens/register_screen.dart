@@ -1,9 +1,12 @@
 // ignore_for_file: use_key_in_widget_constructors
 
+import 'package:provider/provider.dart';
+import 'package:flutter/material.dart';
+//
+import 'package:auth_app/widgets/custom_field.dart';
+import 'package:auth_app/provider/auth_provider.dart';
 import 'package:auth_app/widgets/auth_background.dart';
 import 'package:auth_app/widgets/custom_buttom_sign.dart';
-import 'package:auth_app/widgets/custom_field.dart';
-import 'package:flutter/material.dart';
 
 const imageSvg = 'assets/register.svg';
 Color primary = Colors.white.withOpacity(0.6);
@@ -23,7 +26,10 @@ class RegisterScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(height: size.height * 0.4),
-                _RegisterForm(),
+                ChangeNotifierProvider(
+                  create: (_) => AuthProvider(),
+                  child: _RegisterForm(),
+                ),
                 const SizedBox(height: 80),
                 Text(
                   '¿Ya tienes Cuenta?',
@@ -61,7 +67,9 @@ class RegisterScreen extends StatelessWidget {
 class _RegisterForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
     return Form(
+      key: authProvider.formKey,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       child: Column(
         children: [
@@ -102,14 +110,15 @@ class _RegisterForm extends StatelessWidget {
                   color: primary,
                 ),
               ),
-              onChanged: (value) {},
+              onChanged: (value) => authProvider.email = value,
             ),
           ),
           const SizedBox(height: 20),
           // Password
           CustomTextField(
             child: TextFormField(
-              obscureText: true, // condicion aca
+              obscureText:
+                  authProvider.isVisible ? true : false, // condicion aca
               cursorColor: Colors.tealAccent,
               autocorrect: false,
               keyboardType: TextInputType.visiblePassword,
@@ -124,22 +133,37 @@ class _RegisterForm extends StatelessWidget {
                   color: primary,
                 ),
                 suffixIcon: IconButton(
-                  icon: Icon(
-                    Icons.visibility_off, //visibility_rounded
-                    size: 24,
-                    color: primary,
-                  ),
-                  onPressed: () {},
+                  icon: authProvider.isVisible
+                      ? Icon(
+                          Icons.visibility_rounded,
+                          size: 24,
+                          color: primary,
+                        )
+                      : Icon(
+                          Icons.visibility_off,
+                          size: 24,
+                          color: primary,
+                        ),
+                  onPressed: () =>
+                      authProvider.isVisible = !authProvider.isVisible,
                 ),
               ),
-              onChanged: (value) {},
+              onChanged: (value) => authProvider.password = value,
             ),
           ),
           const SizedBox(height: 60),
           // Sign un
           CustomButtomSign(
             text: 'Sign Up',
-            onPressed: () {},
+            onPressed: () {
+              FocusScope.of(context).unfocus();
+
+              final authenticate = authProvider.isValidForm();
+
+              if (!authenticate) return debugPrint('Ocurrio un error');
+
+              debugPrint('Excelente');
+            },
           ),
         ],
       ),
