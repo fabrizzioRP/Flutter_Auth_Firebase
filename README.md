@@ -1,16 +1,3 @@
-# auth_app
+# Auth App with Firebase
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+<img src="https://user-images.githubusercontent.com/56281886/149259257-6b9a44a7-46e1-471c-b25c-0b019e7094dc.jpg" width="250" height="540"> <img src="https://user-images.githubusercontent.com/56281886/149259247-9204bede-5cdc-41af-9c71-f3b7b949d4f3.jpg" width="250" height="540">
