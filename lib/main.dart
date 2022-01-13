@@ -1,8 +1,11 @@
 // ignore_for_file: use_key_in_widget_constructors
 
 import 'package:flutter/material.dart';
-import 'package:auth_app/screens/login_screen.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+
+import 'services/auth_fire_service.dart';
+import 'package:auth_app/screens/login_screen.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light.copyWith(
@@ -14,11 +17,12 @@ void main() {
 
 class MyApp extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Auth App',
-      home: LoginScreen(),
-    );
-  }
+  Widget build(BuildContext context) => ChangeNotifierProvider(
+        create: (_) => AuthFirebaseService(),
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Auth App',
+          home: LoginScreen(),
+        ),
+      );
 }

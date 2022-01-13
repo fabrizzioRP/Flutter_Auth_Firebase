@@ -1,12 +1,14 @@
 // ignore_for_file: use_key_in_widget_constructors
 
-import 'package:provider/provider.dart';
+import 'package:auth_app/screens/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 //
 import 'package:auth_app/widgets/custom_field.dart';
 import 'package:auth_app/provider/auth_provider.dart';
 import 'package:auth_app/widgets/auth_background.dart';
 import 'package:auth_app/widgets/custom_buttom_sign.dart';
+import 'package:auth_app/services/auth_fire_service.dart';
 
 const imageSvg = 'assets/register.svg';
 Color primary = Colors.white.withOpacity(0.6);
@@ -90,6 +92,7 @@ class _RegisterForm extends StatelessWidget {
                   color: primary,
                 ),
               ),
+              onChanged: (value) => authProvider.nombre = value,
             ),
           ),
           const SizedBox(height: 20),
@@ -135,12 +138,12 @@ class _RegisterForm extends StatelessWidget {
                 suffixIcon: IconButton(
                   icon: authProvider.isVisible
                       ? Icon(
-                          Icons.visibility_rounded,
+                          Icons.visibility_off,
                           size: 24,
                           color: primary,
                         )
                       : Icon(
-                          Icons.visibility_off,
+                          Icons.visibility_rounded,
                           size: 24,
                           color: primary,
                         ),
@@ -152,18 +155,45 @@ class _RegisterForm extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 60),
-          // Sign un
+          // Sign up
           CustomButtomSign(
             text: 'Sign Up',
-            onPressed: () {
-              FocusScope.of(context).unfocus();
+            onPressed: authProvider.isLoading
+                ? () {}
+                : () async {
+                    FocusScope.of(context).unfocus();
 
-              final authenticate = authProvider.isValidForm();
+                    final authService = Provider.of<AuthFirebaseService>(
+                        context,
+                        listen: false);
 
-              if (!authenticate) return debugPrint('Ocurrio un error');
+                    if (!authProvider.isValidForm()) {
+                      return debugPrint('Formulario No valido');
+                    }
 
-              debugPrint('Excelente');
-            },
+                    authProvider.isLoading = true;
+
+                    final String? messageError = await authService.createUser(
+                        authProvider.email, authProvider.password);
+
+                    if (messageError == null) {
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          settings: RouteSettings(arguments: authProvider),
+                          transitionDuration: const Duration(milliseconds: 500),
+                          pageBuilder: (_, value, ___) => FadeTransition(
+                            opacity: value,
+                            child: HomeScreen(),
+                          ),
+                        ),
+                      );
+                      // authProvider.isLoading = false;
+                    } else {
+                      debugPrint(messageError);
+                      authProvider.isLoading = false;
+                    }
+                  },
           ),
         ],
       ),
